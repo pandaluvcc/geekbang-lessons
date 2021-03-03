@@ -24,11 +24,26 @@ public class H2DatabaseUserRepository implements UserRepository {
     }
 
     private DataSource initDataSource() {
+        this.initData();
         return null;
     }
 
     @Override
     public boolean save(User user) {
+        try {
+            Class.forName("org.h2.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        try (Connection conn = DriverManager.getConnection("jdbc:h2:file:D:/data/sample", "sa", "")) {
+            Statement stmt = conn.createStatement();
+            int num = stmt.executeUpdate("insert into `user` (`name`, `password`, `age`) values ('" + user.getName() + "', '" + user.getPassword() + "', 18);");
+            if (num > 0) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
@@ -49,7 +64,25 @@ public class H2DatabaseUserRepository implements UserRepository {
 
     @Override
     public User getByNameAndPassword(String userName, String password) {
-        return null;
+        User user = new User();
+        try {
+            Class.forName("org.h2.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+        try (Connection conn = DriverManager.getConnection("jdbc:h2:file:D:/data/sample", "sa", "")) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from user where name = " + "'" + userName + "'" + " and password = " + "'" + password + "' ");
+            while (rs.next()) {
+                user.setId(Long.parseLong(rs.getString("id")));
+                user.setName(rs.getString("name"));
+                user.setPassword(rs.getString("password"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return user;
     }
 
     @Override
@@ -60,6 +93,28 @@ public class H2DatabaseUserRepository implements UserRepository {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             return null;
+        }
+        try (Connection conn = DriverManager.getConnection("jdbc:h2:file:D:/data/sample", "sa", "")) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from user");
+            while (rs.next()) {
+                User user = new User();
+                user.setId(Long.parseLong(rs.getString("id")));
+                user.setName(rs.getString("name"));
+                user.setPassword(rs.getString("password"));
+                userList.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return userList;
+    }
+
+    private void initData() {
+        try {
+            Class.forName("org.h2.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
         try (Connection conn = DriverManager.getConnection("jdbc:h2:file:D:/data/sample", "sa", "")) {
             Statement stmt = conn.createStatement();
@@ -80,18 +135,8 @@ public class H2DatabaseUserRepository implements UserRepository {
                     "insert into `user` (`name`,`age`, `password`) values ('Jerry', 27, '112233');" +
                             "insert into `user` (`name`,`age`, `password`) values ('Angel', 25, '112233');"
             );
-
-            ResultSet rs = stmt.executeQuery("select * from user");
-            while (rs.next()) {
-                User user = new User();
-                user.setId(Long.parseLong(rs.getString("id")));
-                user.setName(rs.getString("name"));
-                user.setPassword(rs.getString("password"));
-                userList.add(user);
-            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return userList;
     }
 }
