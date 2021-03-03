@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 
 /**
  * 输出 “Hello,World” Controller
+ * @author Charles
  */
 @Path("/hello")
 public class HelloWorldController implements PageController {

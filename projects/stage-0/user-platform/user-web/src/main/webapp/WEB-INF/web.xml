@@ -41,6 +41,45 @@
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 
+    <!--Start -->
+    <!-- web应用启动时启动H2数据库，默认嵌入式连接（只可本地JDBC连接，与Web应用同进程） -->
+    <listener>
+        <listener-class>org.h2.server.web.DbStarter</listener-class>
+    </listener>
+
+    <!-- 定义H2数据库的连接参数，用户与密码，并设置允许TCP远程连接。 -->
+    <context-param>
+        <param-name>db.url</param-name>
+        <!-- 如果数据库不存在，会创建 -->
+        <param-value>jdbc:h2:~/test</param-value>
+    </context-param>
+    <context-param>
+        <param-name>db.user</param-name>
+        <param-value>sa</param-value>
+    </context-param>
+    <context-param>
+        <!-- 不能是空密码，否则启动时报错 -->
+        <param-name>db.password</param-name>
+        <param-value>sa</param-value>
+    </context-param>
+    <context-param>
+        <param-name>db.tcpServer</param-name>
+        <param-value>-tcpAllowOthers</param-value>
+    </context-param>
+
+    <!-- H2控制台是一个独立的应用程序，包含自己的Web服务器，但它也可以用作servlet。 -->
+    <!-- 注意的是，h2数据库必须以服务器模式或混合模式启动 -->
+    <servlet>
+        <servlet-name>H2Console</servlet-name>
+        <servlet-class>org.h2.server.web.WebServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>H2Console</servlet-name>
+        <url-pattern>/console/*</url-pattern>
+    </servlet-mapping>
+    <!--End -->
+
     <filter>
         <filter-name>CharsetEncodingFilter</filter-name>
         <filter-class>org.geektimes.projects.user.web.filter.CharsetEncodingFilter</filter-class>
