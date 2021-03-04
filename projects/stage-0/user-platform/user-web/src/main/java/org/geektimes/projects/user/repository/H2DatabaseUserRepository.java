@@ -119,6 +119,7 @@ public class H2DatabaseUserRepository implements UserRepository {
         try (Connection conn = DriverManager.getConnection("jdbc:h2:file:D:/data/sample", "sa", "")) {
             Statement stmt = conn.createStatement();
 
+            // 创建 User 表
             stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS `user` (" +
                             "  `id` int(11) unsigned NOT NULL AUTO_INCREMENT," +
@@ -128,13 +129,17 @@ public class H2DatabaseUserRepository implements UserRepository {
                             "  PRIMARY KEY (`id`)" +
                             ");"
             );
-
+            System.out.println("### 创建 User 表 成功 !");
+            // 清除表中数据
+            stmt.executeUpdate("truncate table `user`");
+            System.out.println("### 清除表中数据成功 !");
             // 插入数据记录
             // id主键是自动生成
             stmt.executeUpdate(
                     "insert into `user` (`name`,`age`, `password`) values ('Jerry', 27, '112233');" +
                             "insert into `user` (`name`,`age`, `password`) values ('Angel', 25, '112233');"
             );
+            System.out.println("### 初始化数据成功 !");
         } catch (SQLException e) {
             e.printStackTrace();
         }
