@@ -1,6 +1,7 @@
 package org.geektimes.projects.user.repository;
 
 import org.geektimes.projects.user.domain.User;
+import org.geektimes.projects.user.sql.DBConnectionManager;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -23,8 +24,12 @@ public class H2DatabaseUserRepository implements UserRepository {
         this.dataSource = initDataSource();
     }
 
+    public Connection getConnection() {
+        return DBConnectionManager.getConnection();
+    }
+
     private DataSource initDataSource() {
-        this.initData();
+//        this.initData();
         return null;
     }
 
