@@ -1,5 +1,6 @@
 package org.geektimes.projects.user.repository;
 
+import org.geektimes.projects.user.context.ComponentContext;
 import org.geektimes.projects.user.domain.User;
 import org.geektimes.projects.user.sql.DBConnectionManager;
 
@@ -14,18 +15,14 @@ import java.util.List;
  */
 public class H2DatabaseUserRepository implements UserRepository {
 
-    private final DataSource dataSource;
-
-    public H2DatabaseUserRepository(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+    private final DBConnectionManager dbConnectionManager;
 
     public H2DatabaseUserRepository() {
-        this.dataSource = initDataSource();
+        this.dbConnectionManager = ComponentContext.getInstance().getComponent("bean/DBConnectionManager");
     }
 
     public Connection getConnection() {
-        return DBConnectionManager.getConnection();
+        return dbConnectionManager.getConnection();
     }
 
     private DataSource initDataSource() {
@@ -35,12 +32,7 @@ public class H2DatabaseUserRepository implements UserRepository {
 
     @Override
     public boolean save(User user) {
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        try (Connection conn = DriverManager.getConnection("jdbc:h2:file:D:/data/sample", "sa", "")) {
+        try (Connection conn = getConnection()) {
             Statement stmt = conn.createStatement();
             int num = stmt.executeUpdate("insert into `user` (`name`, `password`, `age`) values ('" + user.getName() + "', '" + user.getPassword() + "', 18);");
             if (num > 0) {
@@ -70,13 +62,7 @@ public class H2DatabaseUserRepository implements UserRepository {
     @Override
     public User getByNameAndPassword(String userName, String password) {
         User user = new User();
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-        try (Connection conn = DriverManager.getConnection("jdbc:h2:file:D:/data/sample", "sa", "")) {
+        try (Connection conn = getConnection()) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("select * from user where name = " + "'" + userName + "'" + " and password = " + "'" + password + "' ");
             while (rs.next()) {
@@ -93,13 +79,7 @@ public class H2DatabaseUserRepository implements UserRepository {
     @Override
     public Collection<User> getAll() {
         List<User> userList = new ArrayList<>();
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-        try (Connection conn = DriverManager.getConnection("jdbc:h2:file:D:/data/sample", "sa", "")) {
+        try (Connection conn = getConnection()) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("select * from user");
             while (rs.next()) {
@@ -111,6 +91,7 @@ public class H2DatabaseUserRepository implements UserRepository {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
         return userList;
     }

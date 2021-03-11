@@ -5,14 +5,18 @@
          http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          metadata-complete="true" version="2.5">
 
+    <listener>
+        <listener-class>org.geektimes.projects.user.web.listener.ComponentContextInitializerListener</listener-class>
+    </listener>
+    
+    <listener>
+        <listener-class>org.geektimes.projects.user.web.listener.TestListener</listener-class>
+    </listener>
+
     <!--Start -->
     <!-- web应用启动时启动H2数据库，默认嵌入式连接（只可本地JDBC连接，与Web应用同进程） -->
     <listener>
         <listener-class>org.h2.server.web.DbStarter</listener-class>
-    </listener>
-    
-    <listener>
-        <listener-class>org.geektimes.projects.user.web.filter.DBConnectionInitializerListener</listener-class>
     </listener>
 
     <!-- 定义H2数据库的连接参数，用户与密码，并设置允许TCP远程连接。 -->
@@ -134,5 +138,10 @@
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
+    
+    <resource-env-ref>
+        <resource-env-ref-name>bean/DBConnectionManager</resource-env-ref-name>
+        <resource-env-ref-type>org.geektimes.projects.user.sql.DBConnectionManager</resource-env-ref-type>
+    </resource-env-ref>
 
 </web-app>
